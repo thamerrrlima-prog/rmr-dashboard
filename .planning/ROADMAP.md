@@ -6,7 +6,7 @@ Tres fases que entregam um dashboard Streamlit completo: a Fase 1 constrói o mo
 
 ## Phases
 
-- [ ] **Phase 1: Motor RMR** - Ingestao de arquivos e calculo completo do modelo RMR (base para tudo)
+- [x] **Phase 1: Motor RMR** - Ingestao de arquivos e calculo completo do modelo RMR (base para tudo)
 - [ ] **Phase 2: Painel Analitico** - KPIs, visualizacoes, configuracao de limiares e receita projetada
 - [ ] **Phase 3: Lista de Prioridade e Deploy** - Tabela de contatos com filtros, tema dark e deploy no Streamlit Cloud
 
@@ -26,7 +26,7 @@ Tres fases que entregam um dashboard Streamlit completo: a Fase 1 constrói o mo
 Plans:
 - [x] 01-01-PLAN.md — Ingestão e filtragem dos dois arquivos .xlsx (data_loader.py)
 - [x] 01-02-PLAN.md — Motor RMR: cálculo de R, M, Ritmo, GAP e scores por quintis por PlayG
-- [ ] 01-03-PLAN.md — Segmentação em 8 segmentos RMR + 5 faixas de GAP + entrypoint Streamlit
+- [x] 01-03-PLAN.md — Segmentação em 8 segmentos RMR + 5 faixas de GAP + entrypoint Streamlit
 
 ### Phase 2: Painel Analitico
 **Goal**: O vendedor ve KPIs, graficos e projecoes de receita — tudo recalculando em tempo real ao ajustar os limiares de GAP
@@ -58,6 +58,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Motor RMR | 2/3 | In progress | - |
+| 1. Motor RMR | 3/3 | Complete | 2026-03-09 |
 | 2. Painel Analitico | 0/TBD | Not started | - |
 | 3. Lista de Prioridade e Deploy | 0/TBD | Not started | - |

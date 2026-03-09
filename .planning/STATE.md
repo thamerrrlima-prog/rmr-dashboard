@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-09)
 ## Current Position
 
 Phase: 1 of 3 (Motor RMR)
-Plan: 3 of 3 in current phase (next: 01-03)
-Status: In progress
-Last activity: 2026-03-09 — Plan 01-02 completed: RMR engine with scores (19 new tests, 45 total passing)
+Plan: 3 of 3 in current phase — all plans complete (awaiting human-verify checkpoint for 01-03)
+Status: Phase 1 complete (pending final human verification)
+Last activity: 2026-03-09 — Plan 01-03 completed: segmentation (8 segments, 5 GAP ranges) + Streamlit app (84 tests passing)
 
-Progress: [██░░░░░░░░] 20%
+Progress: [████░░░░░░] 33%
 
 ## Performance Metrics
 
@@ -27,10 +27,10 @@ Progress: [██░░░░░░░░] 20%
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| Phase 1 — Motor RMR | 2 | 7 min | 4 min |
+| Phase 1 — Motor RMR | 3 | 15 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 2 min, 5 min
+- Last 5 plans: 2 min, 5 min, 8 min
 - Trend: baseline
 
 *Updated after each plan completion*
@@ -53,6 +53,9 @@ Recent decisions affecting current work:
 - assign_scores() como função separada — permite Plan 03 chamar independentemente sem recomputar agregações base (01-02)
 - Inversão de scores via labels=[5,4,3,2,1] no pd.qcut — mais idiomático que reversão pós-cálculo (01-02)
 - Clientes com Ritmo=NaN mantidos no DataFrame de saída — exclusão é responsabilidade do Plan 03 (01-02)
+- Ordem de prioridade dos segmentos: Campeões → Não Pode Perder → Leais → Novos Clientes → Potenciais Leais → Em Risco → Hibernando → Precisam Atenção (01-03)
+- DEFAULT_GAP_THRESHOLDS exportado como constante de módulo — Fase 2 importa e sobrescreve via input do usuário (01-03)
+- st.session_state armazena resultado após cálculo — evita recálculo do pipeline ao interagir com a UI (01-03)
 
 ### Pending Todos
 
@@ -65,5 +68,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-09
-Stopped at: Completed 01-02-PLAN.md — RMR engine (src/rmr_engine.py, 45 tests passing)
+Stopped at: Completed 01-03-PLAN.md — segmentation + Streamlit app (src/segmentation.py, src/app.py, 84 tests passing). Awaiting human-verify checkpoint.
 Resume file: None

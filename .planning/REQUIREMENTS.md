@@ -22,8 +22,8 @@
 - [x] **RMR-05**: Sistema calcula GAP de cada cliente (GAP = Ritmo − Recência)
 - [x] **RMR-06**: Sistema atribui Score de 1 a 5 por quintis para cada dimensão (R, M, Ritmo), calculados independentemente por PlayG
 - [x] **RMR-07**: Sistema inverte score de Recência e Ritmo (menor valor = score maior)
-- [ ] **RMR-08**: Sistema classifica cada cliente em um dos 8 segmentos RMR com base nos scores
-- [ ] **RMR-09**: Sistema classifica o status do GAP em faixas (Crítico, Atrasado, Hora de Comprar, Em Breve, Folgado)
+- [x] **RMR-08**: Sistema classifica cada cliente em um dos 8 segmentos RMR com base nos scores
+- [x] **RMR-09**: Sistema classifica o status do GAP em faixas (Crítico, Atrasado, Hora de Comprar, Em Breve, Folgado)
 
 ### Configuração
 
@@ -80,7 +80,7 @@
 |-------------|-------|--------|
 | DAD-01 a DAD-05 | Phase 1 | Complete |
 | RMR-01 a RMR-07 | Phase 1 | Complete (01-02) |
-| RMR-08, RMR-09 | Phase 1 | Pending (01-03) |
+| RMR-08, RMR-09 | Phase 1 | Complete (01-03) |
 | CFG-01, CFG-02 | Phase 2 | Pending |
 | VIZ-01 a VIZ-04 | Phase 2 | Pending |
 | REV-01, REV-02 | Phase 2 | Pending |
