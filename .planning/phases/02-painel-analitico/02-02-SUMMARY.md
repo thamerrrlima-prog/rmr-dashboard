@@ -74,7 +74,7 @@ Each task was committed atomically:
 1. **Task 1: KPI cards e lista de segmentos na Tab Painel** - `ab6d21c` (feat)
 2. **Task 2: Histograma de GAP por faixas na Tab Painel** - `2b8f3c3` (feat)
 
-**Plan metadata:** (docs commit follows)
+**Plan metadata:** `5d55631` (docs: complete Tab Painel plan)
 
 ## Files Created/Modified
 - `src/app.py` - Tab Painel implementation: KPIs, segment table, GAP bar chart; pandas and plotly.express imports added
