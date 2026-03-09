@@ -34,13 +34,13 @@
 
 - [x] **VIZ-01**: Cards com KPIs: total de clientes no RMR, % com GAP negativo, receita em risco (monetário dos clientes com GAP < 0), ritmo médio da base
 - [x] **VIZ-02**: Barras horizontais de distribuição por segmento RMR (quantidade de clientes e receita por segmento)
-- [ ] **VIZ-03**: Matriz R × Ritmo — heatmap 5×5 com quantidade de clientes por célula
+- [x] **VIZ-03**: Matriz R × Ritmo — heatmap 5×5 com quantidade de clientes por célula
 - [x] **VIZ-04**: Histograma de distribuição de GAP agrupado pelas 5 faixas de status (quantidade de clientes + receita por faixa)
 
 ### Receita Projetada
 
-- [ ] **REV-01**: Bloco de receita semanal: soma do ticket médio dos clientes com GAP entre -5 e +5 dias
-- [ ] **REV-02**: Bloco de projeção estratégica: receita projetada para 30, 60 e 90 dias — calculada por cliente como ticket médio × número de compras esperadas no período (período / ritmo)
+- [x] **REV-01**: Bloco de receita semanal: soma do ticket médio dos clientes com GAP entre -5 e +5 dias
+- [x] **REV-02**: Bloco de projeção estratégica: receita projetada para 30, 60 e 90 dias — calculada por cliente como ticket médio × número de compras esperadas no período (período / ritmo)
 
 ### Lista de Prioridade
 
