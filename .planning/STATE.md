@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 02-painel-analitico-02-01-PLAN.md
-last_updated: "2026-03-09T19:52:11.402Z"
+stopped_at: Completed 02-painel-analitico-02-02-PLAN.md
+last_updated: "2026-03-09T19:55:26.901Z"
 last_activity: "2026-03-09 — Plan 01-03 completed: segmentation (8 segments, 5 GAP ranges) + Streamlit app (84 tests passing)"
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 5
   percent: 33
 ---
 
@@ -51,6 +51,7 @@ Progress: [████░░░░░░] 33%
 
 *Updated after each plan completion*
 | Phase 02-painel-analitico P01 | 3 | 1 tasks | 1 files |
+| Phase 02-painel-analitico P02 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,8 @@ Recent decisions affecting current work:
 - st.session_state armazena resultado após cálculo — evita recálculo do pipeline ao interagir com a UI (01-03)
 - [Phase 02-painel-analitico]: rmr_df armazenado separado de rmr_result no session_state — evita re-execução do pipeline pesado ao ajustar limiares (02-01)
 - [Phase 02-painel-analitico]: st.rerun() disparado apenas quando new_thresholds difere do session_state — evita loop infinito de reruns (02-01)
+- [Phase 02-painel-analitico]: c1.metric/c2.metric column-scoped pattern used for KPI cards — keeps 4 metrics aligned in single row
+- [Phase 02-painel-analitico]: GAP histogram uses same elegíveis filter as KPIs — consistent exclusion of Inelegível across all Painel visualizations
 
 ### Pending Todos
 
@@ -86,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T19:52:11.401Z
-Stopped at: Completed 02-painel-analitico-02-01-PLAN.md
+Last session: 2026-03-09T19:55:26.899Z
+Stopped at: Completed 02-painel-analitico-02-02-PLAN.md
 Resume file: None

@@ -32,10 +32,10 @@
 
 ### KPIs e Visualizações
 
-- [ ] **VIZ-01**: Cards com KPIs: total de clientes no RMR, % com GAP negativo, receita em risco (monetário dos clientes com GAP < 0), ritmo médio da base
-- [ ] **VIZ-02**: Barras horizontais de distribuição por segmento RMR (quantidade de clientes e receita por segmento)
+- [x] **VIZ-01**: Cards com KPIs: total de clientes no RMR, % com GAP negativo, receita em risco (monetário dos clientes com GAP < 0), ritmo médio da base
+- [x] **VIZ-02**: Barras horizontais de distribuição por segmento RMR (quantidade de clientes e receita por segmento)
 - [ ] **VIZ-03**: Matriz R × Ritmo — heatmap 5×5 com quantidade de clientes por célula
-- [ ] **VIZ-04**: Histograma de distribuição de GAP agrupado pelas 5 faixas de status (quantidade de clientes + receita por faixa)
+- [x] **VIZ-04**: Histograma de distribuição de GAP agrupado pelas 5 faixas de status (quantidade de clientes + receita por faixa)
 
 ### Receita Projetada
 
