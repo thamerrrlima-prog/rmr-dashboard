@@ -1,107 +1,51 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
-status: verifying
-stopped_at: Completed 03-lista-de-prioridade-e-deploy-03-01-PLAN.md
-last_updated: "2026-03-09T21:20:51.996Z"
-last_activity: "2026-03-09 — Plan 01-03 completed: segmentation (8 segments, 5 GAP ranges) + Streamlit app (84 tests passing)"
+milestone_name: MVP
+status: complete
+stopped_at: v1.0 milestone archived
+last_updated: "2026-03-09T00:00:00.000Z"
+last_activity: "2026-03-09 — v1.0 MVP shipped: 3 phases, 10 plans, 84 tests passing, deployed to Streamlit Cloud"
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 10
-  completed_plans: 9
-  percent: 33
+  completed_plans: 10
+  percent: 100
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-09)
+See: .planning/PROJECT.md (updated 2026-03-09 after v1.0 milestone)
 
-**Core value:** O vendedor abre o dashboard e sabe exatamente quem ligar hoje — ordenado por quem esta mais atrasado para comprar, com telefone e ticket medio na mesma tela.
-**Current focus:** Phase 1 — Motor RMR
+**Core value:** O vendedor abre o dashboard e sabe exatamente quem ligar hoje — ordenado por quem está mais atrasado para comprar, com telefone e ticket médio na mesma tela.
+**Current focus:** Planning next milestone — run `/gsd:new-milestone`
 
 ## Current Position
 
-Phase: 1 of 3 (Motor RMR)
-Plan: 3 of 3 in current phase — all plans complete (awaiting human-verify checkpoint for 01-03)
-Status: Phase 1 complete (pending final human verification)
-Last activity: 2026-03-09 — Plan 01-03 completed: segmentation (8 segments, 5 GAP ranges) + Streamlit app (84 tests passing)
+Milestone v1.0 MVP — COMPLETE ✅
 
-Progress: [████░░░░░░] 33%
-
-## Performance Metrics
-
-**Velocity:**
-- Total plans completed: 2
-- Average duration: 4 min
-- Total execution time: 7 min
-
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| Phase 1 — Motor RMR | 3 | 15 min | 5 min |
-
-**Recent Trend:**
-- Last 5 plans: 2 min, 5 min, 8 min
-- Trend: baseline
-
-*Updated after each plan completion*
-| Phase 02-painel-analitico P01 | 3 | 1 tasks | 1 files |
-| Phase 02-painel-analitico P02 | 2min | 2 tasks | 2 files |
-| Phase 02-painel-analitico P03 | 2min | 2 tasks | 1 files |
-| Phase 02-painel-analitico P04 | 2min | 2 tasks | 1 files |
-| Phase 03-lista-de-prioridade-e-deploy P02 | 1min | 2 tasks | 2 files |
-| Phase 03-lista-de-prioridade-e-deploy P01 | 2min | 1 tasks | 1 files |
+All 3 phases shipped (10/10 plans). Dashboard deployed to Streamlit Cloud.
+Next: define v2 requirements via `/gsd:new-milestone`.
 
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-- Streamlit + pandas em vez de HTML puro (quintis por PlayG sao complexos para JS)
-- Quintis calculados separadamente por PlayG (comportamento de compra difere entre PGs)
-- GAP como ordenacao principal da tabela (responde diretamente "quem ligar hoje")
-- Limiares de GAP configuráveis via UI (permite ajuste sem alterar codigo)
-- validate_columns usa alias map dict[str, list[str]] para normalização case-insensitive de colunas (01-01)
-- Exclusão do PG1 via inner join em get_valid_transactions — mantém lógica DRY (01-01)
-- Constantes COLUNAS_BASE_BU, COLUNAS_HISTORICO, TIPOS_VALIDOS, DATA_MINIMA no topo do módulo (01-01)
-- Ritmo usa drop_duplicates em datas antes do diff — evita inflação de frequência por múltiplas transações no mesmo dia (01-02)
-- assign_scores() como função separada — permite Plan 03 chamar independentemente sem recomputar agregações base (01-02)
-- Inversão de scores via labels=[5,4,3,2,1] no pd.qcut — mais idiomático que reversão pós-cálculo (01-02)
-- Clientes com Ritmo=NaN mantidos no DataFrame de saída — exclusão é responsabilidade do Plan 03 (01-02)
-- Ordem de prioridade dos segmentos: Campeões → Não Pode Perder → Leais → Novos Clientes → Potenciais Leais → Em Risco → Hibernando → Precisam Atenção (01-03)
-- DEFAULT_GAP_THRESHOLDS exportado como constante de módulo — Fase 2 importa e sobrescreve via input do usuário (01-03)
-- st.session_state armazena resultado após cálculo — evita recálculo do pipeline ao interagir com a UI (01-03)
-- [Phase 02-painel-analitico]: rmr_df armazenado separado de rmr_result no session_state — evita re-execução do pipeline pesado ao ajustar limiares (02-01)
-- [Phase 02-painel-analitico]: st.rerun() disparado apenas quando new_thresholds difere do session_state — evita loop infinito de reruns (02-01)
-- [Phase 02-painel-analitico]: c1.metric/c2.metric column-scoped pattern used for KPI cards — keeps 4 metrics aligned in single row
-- [Phase 02-painel-analitico]: GAP histogram uses same elegíveis filter as KPIs — consistent exclusion of Inelegível across all Painel visualizations
-- [Phase 02-painel-analitico]: ticket_medio = Monetario (total do período) — num_compras ausente em result_df; estimativa conservadora documentada em código
-- [Phase 02-painel-analitico]: calcular_projecao() filtra Ritmo > 0 além de notna() — evita divisão por zero em edge cases
-- [Phase 02-painel-analitico]: VIZ-03 (heatmap R x Ritmo) intentionally excluded per explicit user decision
-- [Phase 02-painel-analitico]: GAP histogram uses .melt() long format for px.bar barmode='group' dual-series chart (Clientes blue, Receita green)
-- [Phase 03-lista-de-prioridade-e-deploy]: python-calamine kept in requirements.txt — _read_excel_robust() uses engine='calamine' as fallback in data_loader.py
-- [Phase 03-lista-de-prioridade-e-deploy]: pytest removed from requirements.txt — dev dependency not needed on Streamlit Cloud
-- [Phase 03-lista-de-prioridade-e-deploy]: 5 tabs always visible without conditional: Lista | Receita | Painel | Importação | Configuração
-- [Phase 03-lista-de-prioridade-e-deploy]: Upload block moved into tab_importacao — cleaner entry point for first-time users
-- [Phase 03-lista-de-prioridade-e-deploy]: Projeção Estratégica relocated from tab_receita to tab_painel — strategic view belongs with KPIs
+All key decisions logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
-None yet.
+None.
 
 ## Session Continuity
 
-Last session: 2026-03-09T21:20:51.994Z
-Stopped at: Completed 03-lista-de-prioridade-e-deploy-03-01-PLAN.md
+Last session: 2026-03-09
+Stopped at: v1.0 milestone archived
 Resume file: None
