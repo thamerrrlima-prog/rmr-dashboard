@@ -27,8 +27,8 @@
 
 ### Configuração
 
-- [ ] **CFG-01**: Usuário pode configurar os limiares de cada faixa de GAP via painel na interface
-- [ ] **CFG-02**: Ao alterar os limiares, dashboard recalcula as classificações e atualiza todas as visualizações em tempo real
+- [x] **CFG-01**: Usuário pode configurar os limiares de cada faixa de GAP via painel na interface
+- [x] **CFG-02**: Ao alterar os limiares, dashboard recalcula as classificações e atualiza todas as visualizações em tempo real
 
 ### KPIs e Visualizações
 
