@@ -6,6 +6,7 @@ Pipeline: upload → data_loader → rmr_engine → segmentation → painel anal
 
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 import sys
 import os
 
@@ -123,6 +124,39 @@ if "rmr_result" in st.session_state:
         )
         seg_counts.columns = ["Segmento", "Clientes"]
         st.dataframe(seg_counts, use_container_width=True, hide_index=True)
+
+        st.divider()
+        st.subheader("Distribuição de GAP por Faixa")
+
+        ORDEM_FAIXAS = ["Crítico", "Atrasado", "Hora de Comprar", "Em Breve", "Folgado"]
+        CORES_FAIXAS = {
+            "Crítico": "#d62728",
+            "Atrasado": "#ff7f0e",
+            "Hora de Comprar": "#2ca02c",
+            "Em Breve": "#1f77b4",
+            "Folgado": "#9467bd",
+        }
+
+        gap_counts = (
+            elegíveis[elegíveis["Faixa_GAP"].isin(ORDEM_FAIXAS)]["Faixa_GAP"]
+            .value_counts()
+            .reindex(ORDEM_FAIXAS, fill_value=0)
+            .reset_index()
+        )
+        gap_counts.columns = ["Faixa", "Clientes"]
+
+        fig = px.bar(
+            gap_counts,
+            x="Faixa",
+            y="Clientes",
+            color="Faixa",
+            color_discrete_map=CORES_FAIXAS,
+            labels={"Faixa": "Faixa de GAP", "Clientes": "Quantidade de Clientes"},
+            text="Clientes",
+        )
+        fig.update_traces(textposition="outside")
+        fig.update_layout(showlegend=False, plot_bgcolor="rgba(0,0,0,0)")
+        st.plotly_chart(fig, use_container_width=True)
 
     with tab_receita:
         st.info("Receita projetada — em construção (Plano 03)")
