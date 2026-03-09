@@ -37,7 +37,12 @@ Plans:
   2. Dashboard mostra distribuicao por segmento RMR (barras), matriz R x Ritmo (heatmap 5x5) e histograma de GAP por faixas
   3. Usuario altera um limiar de GAP no painel e todos os graficos e KPIs atualizam imediatamente sem recarregar a pagina
   4. Bloco de receita projetada exibe valor semanal (GAP -5 a +5) e projecoes para 30, 60 e 90 dias
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Refatoração de session_state + Tab Configuração com 4 sliders de limiares de GAP
+- [ ] 02-02-PLAN.md — Tab Painel: KPI cards, lista de segmentos RMR e histograma de GAP por faixas
+- [ ] 02-03-PLAN.md — Tab Receita: receita semanal (GAP ±5) e projeção estratégica 30/60/90 dias
 
 ### Phase 3: Lista de Prioridade e Deploy
 **Goal**: O vendedor acessa o dashboard via link, ve a lista de quem ligar hoje e consegue filtrar e buscar clientes especificos
@@ -59,5 +64,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Motor RMR | 3/3 | Complete | 2026-03-09 |
-| 2. Painel Analitico | 0/TBD | Not started | - |
+| 2. Painel Analitico | 0/3 | Not started | - |
 | 3. Lista de Prioridade e Deploy | 0/TBD | Not started | - |
