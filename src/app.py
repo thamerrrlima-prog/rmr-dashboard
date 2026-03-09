@@ -5,6 +5,7 @@ Pipeline: upload → data_loader → rmr_engine → segmentation → painel anal
 """
 
 import streamlit as st
+import pandas as pd
 import sys
 import os
 
@@ -93,7 +94,35 @@ if "rmr_result" in st.session_state:
     tab_painel, tab_receita, tab_config = st.tabs(["Painel", "Receita", "Configuração"])
 
     with tab_painel:
-        st.info("Painel analítico — em construção (Plano 02)")
+        result_df = st.session_state["rmr_result"]
+        elegíveis = result_df[result_df["Segmento_RMR"] != "Inelegível"]
+
+        total_rmr = len(elegíveis)
+        pct_gap_negativo = (elegíveis["GAP"] < 0).sum() / len(elegíveis) * 100 if len(elegíveis) > 0 else 0
+        receita_risco = elegíveis[elegíveis["GAP"] < 0]["Monetario"].sum()
+        ritmo_medio = elegíveis["Ritmo"].dropna().mean()
+
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Clientes no RMR", f"{total_rmr:,}")
+        c2.metric("GAP Negativo", f"{pct_gap_negativo:.1f}%")
+        c3.metric("Receita em Risco", f"R$ {receita_risco:,.0f}".replace(",", "."))
+        c4.metric("Ritmo Médio", f"{ritmo_medio:.0f} dias" if not pd.isna(ritmo_medio) else "—")
+
+        st.divider()
+        st.subheader("Distribuição por Segmento RMR")
+
+        ORDEM_SEGMENTOS = [
+            "Campeões", "Não Pode Perder", "Leais", "Novos Clientes",
+            "Potenciais Leais", "Em Risco", "Hibernando", "Precisam Atenção"
+        ]
+        seg_counts = (
+            elegíveis["Segmento_RMR"]
+            .value_counts()
+            .reindex(ORDEM_SEGMENTOS, fill_value=0)
+            .reset_index()
+        )
+        seg_counts.columns = ["Segmento", "Clientes"]
+        st.dataframe(seg_counts, use_container_width=True, hide_index=True)
 
     with tab_receita:
         st.info("Receita projetada — em construção (Plano 03)")
