@@ -32,8 +32,8 @@ if "gap_thresholds" not in st.session_state:
 
 # ─── 5 Tabs — sempre visíveis ─────────────────────────────────────────────────
 
-tab_lista, tab_receita, tab_painel, tab_importacao, tab_config = st.tabs(
-    ["Lista", "Receita", "Painel", "Importação", "Configuração"]
+tab_receita, tab_painel, tab_lista, tab_importacao, tab_config = st.tabs(
+    ["Receita", "Painel", "Lista", "Importação", "Configuração"]
 )
 
 # ─── Tab Lista ────────────────────────────────────────────────────────────────
@@ -173,6 +173,38 @@ with tab_painel:
         c4.metric("Ritmo Médio", f"{ritmo_medio:.0f} dias" if not pd.isna(ritmo_medio) else "—")
 
         st.divider()
+        st.subheader("Projeção Estratégica")
+        st.caption(
+            "Receita esperada por período — calculada por cliente como "
+            "Ticket Médio × compras esperadas (período ÷ Ritmo)."
+        )
+
+        elegíveis_proj = result_df[result_df["Segmento_RMR"] != "Inelegível"].copy()
+        elegíveis_proj["ticket_medio"] = elegíveis_proj["Monetario"]
+
+        # Apenas clientes com Ritmo definido (elegíveis já exclui Inelegível, mas Ritmo pode ser NaN em edge cases)
+        df_proj = elegíveis_proj[elegíveis_proj["Ritmo"].notna() & (elegíveis_proj["Ritmo"] > 0)].copy()
+
+        def calcular_projecao(df: pd.DataFrame, periodo_dias: int) -> float:
+            """Soma receita projetada: ticket_medio × floor(periodo_dias / ritmo) por cliente."""
+            compras_esperadas = (periodo_dias / df["Ritmo"]).apply(lambda x: max(int(x), 0))
+            return (df["ticket_medio"] * compras_esperadas).sum()
+
+        proj_30 = calcular_projecao(df_proj, 30)
+        proj_60 = calcular_projecao(df_proj, 60)
+        proj_90 = calcular_projecao(df_proj, 90)
+
+        c1, c2, c3 = st.columns(3)
+        c1.metric("30 dias", f"R$ {proj_30:,.0f}".replace(",", "."))
+        c2.metric("60 dias", f"R$ {proj_60:,.0f}".replace(",", "."))
+        c3.metric("90 dias", f"R$ {proj_90:,.0f}".replace(",", "."))
+
+        st.caption(
+            f"Base de cálculo: {len(df_proj)} clientes com Ritmo definido "
+            f"(excluídos clientes com 1 compra)."
+        )
+
+        st.divider()
         st.subheader("Distribuição por Segmento RMR")
 
         ORDEM_SEGMENTOS = [
@@ -267,37 +299,6 @@ with tab_painel:
         )
         st.plotly_chart(fig_gap, use_container_width=True)
 
-        st.divider()
-        st.subheader("Projeção Estratégica")
-        st.caption(
-            "Receita esperada por período — calculada por cliente como "
-            "Ticket Médio × compras esperadas (período ÷ Ritmo)."
-        )
-
-        elegíveis_proj = result_df[result_df["Segmento_RMR"] != "Inelegível"].copy()
-        elegíveis_proj["ticket_medio"] = elegíveis_proj["Monetario"]
-
-        # Apenas clientes com Ritmo definido (elegíveis já exclui Inelegível, mas Ritmo pode ser NaN em edge cases)
-        df_proj = elegíveis_proj[elegíveis_proj["Ritmo"].notna() & (elegíveis_proj["Ritmo"] > 0)].copy()
-
-        def calcular_projecao(df: pd.DataFrame, periodo_dias: int) -> float:
-            """Soma receita projetada: ticket_medio × floor(periodo_dias / ritmo) por cliente."""
-            compras_esperadas = (periodo_dias / df["Ritmo"]).apply(lambda x: max(int(x), 0))
-            return (df["ticket_medio"] * compras_esperadas).sum()
-
-        proj_30 = calcular_projecao(df_proj, 30)
-        proj_60 = calcular_projecao(df_proj, 60)
-        proj_90 = calcular_projecao(df_proj, 90)
-
-        c1, c2, c3 = st.columns(3)
-        c1.metric("30 dias", f"R$ {proj_30:,.0f}".replace(",", "."))
-        c2.metric("60 dias", f"R$ {proj_60:,.0f}".replace(",", "."))
-        c3.metric("90 dias", f"R$ {proj_90:,.0f}".replace(",", "."))
-
-        st.caption(
-            f"Base de cálculo: {len(df_proj)} clientes com Ritmo definido "
-            f"(excluídos clientes com 1 compra)."
-        )
 
 # ─── Tab Importação ───────────────────────────────────────────────────────────
 
