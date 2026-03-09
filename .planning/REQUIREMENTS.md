@@ -7,11 +7,11 @@
 
 ### Dados
 
-- [ ] **DAD-01**: Usuário pode fazer upload do arquivo Base B.U. (.xlsx) com colunas ID, Nome, PlayG, Telefone
-- [ ] **DAD-02**: Usuário pode fazer upload do arquivo Histórico de Crédito (.xlsx) com todas as transações
-- [ ] **DAD-03**: Sistema filtra transações válidas (tipo "Nova Compra" ou "Pagamento", valor > R$ 0,00)
-- [ ] **DAD-04**: Sistema exclui transações inválidas ("Troca de Crédito", "Bônus/Desconto", valor = R$ 0,00)
-- [ ] **DAD-05**: Sistema considera apenas transações a partir de 01/01/2024
+- [x] **DAD-01**: Usuário pode fazer upload do arquivo Base B.U. (.xlsx) com colunas ID, Nome, PlayG, Telefone
+- [x] **DAD-02**: Usuário pode fazer upload do arquivo Histórico de Crédito (.xlsx) com todas as transações
+- [x] **DAD-03**: Sistema filtra transações válidas (tipo "Nova Compra" ou "Pagamento", valor > R$ 0,00)
+- [x] **DAD-04**: Sistema exclui transações inválidas ("Troca de Crédito", "Bônus/Desconto", valor = R$ 0,00)
+- [x] **DAD-05**: Sistema considera apenas transações a partir de 01/01/2024
 
 ### Cálculo RMR
 
@@ -78,7 +78,7 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DAD-01 a DAD-05 | Phase 1 | Pending |
+| DAD-01 a DAD-05 | Phase 1 | Complete |
 | RMR-01 a RMR-09 | Phase 1 | Pending |
 | CFG-01, CFG-02 | Phase 2 | Pending |
 | VIZ-01 a VIZ-04 | Phase 2 | Pending |
