@@ -30,71 +30,134 @@ st.title("RMR Dashboard — LigueLead")
 if "gap_thresholds" not in st.session_state:
     st.session_state["gap_thresholds"] = DEFAULT_GAP_THRESHOLDS.copy()
 
-# ─── Upload ───────────────────────────────────────────────────────────────────
+# ─── 5 Tabs — sempre visíveis ─────────────────────────────────────────────────
 
-st.header("Carregar Dados")
+tab_lista, tab_receita, tab_painel, tab_importacao, tab_config = st.tabs(
+    ["Lista", "Receita", "Painel", "Importação", "Configuração"]
+)
 
-col1, col2 = st.columns(2)
+# ─── Tab Lista ────────────────────────────────────────────────────────────────
 
-with col1:
-    base_bu_file = st.file_uploader(
-        "Base B.U.",
-        type=["xlsx"],
-        key="base_bu",
-        help="Arquivo Excel com colunas: ID, Nome, PlayG, Telefone",
-    )
+with tab_lista:
+    if "rmr_result" not in st.session_state:
+        st.info("Importe os dados na aba **Importação** para ver a lista de prioridade.")
+    else:
+        result_df = st.session_state["rmr_result"]
+        elegíveis = result_df[result_df["Segmento_RMR"] != "Inelegível"].copy()
 
-with col2:
-    historico_file = st.file_uploader(
-        "Histórico de Crédito",
-        type=["xlsx"],
-        key="historico",
-        help="Arquivo Excel com colunas: ID, Tipo, Valor, Data",
-    )
+        # Garantir que ID é coluna (pode estar no índice)
+        if "ID" not in elegíveis.columns:
+            elegíveis = elegíveis.reset_index()
+            if elegíveis.columns[0] != "ID":
+                elegíveis = elegíveis.rename(columns={elegíveis.columns[0]: "ID"})
 
-# ─── Cálculo ──────────────────────────────────────────────────────────────────
+        elegíveis["Ticket Médio"] = elegíveis["Monetario"]
 
-if st.button("Calcular RMR", type="primary", disabled=(base_bu_file is None or historico_file is None)):
-    try:
-        with st.spinner("Processando dados..."):
-            # 1. Carregar arquivos
-            base_df = load_base_bu(base_bu_file)
-            hist_df = load_historico(historico_file)
+        # Filtros
+        f1, f2, f3 = st.columns(3)
+        sel_playg = f1.multiselect("PlayG", sorted(elegíveis["PlayG"].dropna().unique()), key="lista_playg")
+        sel_faixa = f2.multiselect(
+            "Classificação GAP",
+            ["Crítico", "Atrasado", "Hora de Comprar", "Em Breve", "Folgado"],
+            key="lista_faixa",
+        )
+        busca = f3.text_input("Buscar nome ou ID", key="lista_busca", placeholder="Digite nome ou ID...")
 
-            # 2. Filtrar transações válidas (exclui PG1, tipos inválidos, etc.)
-            valid_df = get_valid_transactions(base_df, hist_df)
+        # Aplicar filtros (lógica AND)
+        df_lista = elegíveis.copy()
+        if sel_playg:
+            df_lista = df_lista[df_lista["PlayG"].isin(sel_playg)]
+        if sel_faixa:
+            df_lista = df_lista[df_lista["Faixa_GAP"].isin(sel_faixa)]
+        if busca.strip():
+            termo = busca.strip().lower()
+            mask_nome = df_lista["Nome"].str.lower().str.contains(termo, na=False)
+            mask_id = df_lista["ID"].astype(str).str.lower().str.contains(termo, na=False)
+            df_lista = df_lista[mask_nome | mask_id]
 
-            # 3. Calcular RMR + scores (pré-segmentação — imutável após cálculo)
-            rmr_df = compute_rmr(valid_df)
-            st.session_state["rmr_df"] = rmr_df
+        # Selecionar e ordenar colunas
+        COLUNAS_LISTA = ["ID", "Nome", "Telefone", "GAP", "Faixa_GAP", "Ticket Médio"]
+        colunas_existentes = [c for c in COLUNAS_LISTA if c in df_lista.columns]
+        df_exibir = (
+            df_lista[colunas_existentes]
+            .rename(columns={"Faixa_GAP": "Classificação GAP"})
+            .sort_values("GAP")
+            .reset_index(drop=True)
+        )
 
-            # 4. Aplicar segmentação com limiares correntes
-            st.session_state["rmr_result"] = apply_segmentation(
-                rmr_df, st.session_state.get("gap_thresholds", DEFAULT_GAP_THRESHOLDS)
+        st.caption(
+            f"{len(df_exibir)} clientes encontrados — ordenados por urgência (GAP ascendente). "
+            "Clique no cabeçalho da coluna para reordenar."
+        )
+        if len(df_exibir) > 0:
+            st.dataframe(df_exibir, use_container_width=True, hide_index=True)
+        else:
+            st.info("Nenhum cliente encontrado com os filtros atuais.")
+
+# ─── Tab Receita ──────────────────────────────────────────────────────────────
+
+with tab_receita:
+    if "rmr_result" not in st.session_state:
+        st.info("Importe os dados na aba **Importação** para ver a receita.")
+    else:
+        result_df = st.session_state["rmr_result"]
+        elegíveis = result_df[result_df["Segmento_RMR"] != "Inelegível"].copy()
+
+        # Ticket médio = Monetario total do cliente no período (estimativa conservadora)
+        elegíveis["ticket_medio"] = elegíveis["Monetario"]
+
+        st.subheader("Receita Semanal")
+
+        # Filtros — Faixa GAP vem de todos os elegíveis para permitir expandir além da janela semanal
+        f1, f2 = st.columns(2)
+        playg_opts = sorted(elegíveis["PlayG"].dropna().unique())
+        faixa_opts = sorted(elegíveis["Faixa_GAP"].dropna().unique())
+        sel_playg = f1.multiselect("Filtrar por PlayG", playg_opts)
+        sel_faixa = f2.multiselect(
+            "Filtrar por Faixa GAP",
+            faixa_opts,
+            help="Sem seleção = janela imediata (-5 a +5 dias). Selecione faixas para expandir a lista.",
+        )
+
+        # Base: sem filtro de faixa usa janela semanal; com faixa usa todos os elegíveis daquelas faixas
+        if sel_faixa:
+            df_filtrado = elegíveis[elegíveis["Faixa_GAP"].isin(sel_faixa)].copy()
+            st.caption(f"Exibindo faixas selecionadas: {', '.join(sel_faixa)}")
+        else:
+            semanal_mask = (elegíveis["GAP"] >= -5) & (elegíveis["GAP"] <= 5)
+            df_filtrado = elegíveis[semanal_mask].copy()
+            st.caption("Clientes com GAP entre -5 e +5 dias — janela imediata de compra.")
+
+        if sel_playg:
+            df_filtrado = df_filtrado[df_filtrado["PlayG"].isin(sel_playg)]
+
+        receita_semanal = df_filtrado["ticket_medio"].sum()
+        n_clientes_semanal = len(df_filtrado)
+
+        col1, col2 = st.columns(2)
+        col1.metric("Receita Potencial (semana)", f"R$ {receita_semanal:,.0f}".replace(",", "."))
+        col2.metric("Clientes na Janela", f"{n_clientes_semanal}")
+
+        if n_clientes_semanal > 0:
+            colunas = ["Nome", "Telefone", "PlayG", "GAP", "Faixa_GAP", "ticket_medio"]
+            colunas_existentes = [c for c in colunas if c in df_filtrado.columns]
+            st.dataframe(
+                df_filtrado[colunas_existentes]
+                .sort_values("GAP")
+                .rename(columns={"ticket_medio": "Ticket Médio (R$)"})
+                .reset_index(drop=True),
+                use_container_width=True,
+                hide_index=True,
             )
+        else:
+            st.info("Nenhum cliente na janela de -5 a +5 dias com os filtros atuais.")
 
-    except Exception as e:
-        import traceback
-        st.error(f"Erro ao processar os dados: {e}")
-        st.code(traceback.format_exc())
-        st.session_state.pop("rmr_result", None)
-        st.session_state.pop("rmr_df", None)
+# ─── Tab Painel ───────────────────────────────────────────────────────────────
 
-# ─── Exibição dos resultados ──────────────────────────────────────────────────
-
-if "rmr_result" in st.session_state:
-    result_df = st.session_state["rmr_result"]
-
-    total_clientes = len(result_df)
-    inelegiveis = (result_df["Segmento_RMR"] == "Inelegível").sum()
-
-    st.success(
-        f"{total_clientes} clientes no RMR ({inelegiveis} inelegíveis por 1 compra)"
-    )
-
-    tab_painel, tab_receita, tab_config = st.tabs(["Painel", "Receita", "Configuração"])
-
-    with tab_painel:
+with tab_painel:
+    if "rmr_result" not in st.session_state:
+        st.info("Importe os dados na aba **Importação** para ver o painel.")
+    else:
         result_df = st.session_state["rmr_result"]
         elegíveis = result_df[result_df["Segmento_RMR"] != "Inelegível"]
 
@@ -204,38 +267,6 @@ if "rmr_result" in st.session_state:
         )
         st.plotly_chart(fig_gap, use_container_width=True)
 
-    with tab_receita:
-        result_df = st.session_state["rmr_result"]
-        elegíveis = result_df[result_df["Segmento_RMR"] != "Inelegível"].copy()
-
-        # Ticket médio = Monetario total do cliente no período (estimativa conservadora)
-        elegíveis["ticket_medio"] = elegíveis["Monetario"]
-
-        st.subheader("Receita Semanal")
-        st.caption("Clientes com GAP entre -5 e +5 dias — janela imediata de compra.")
-
-        semanal_mask = (elegíveis["GAP"] >= -5) & (elegíveis["GAP"] <= 5)
-        df_semanal = elegíveis[semanal_mask]
-
-        receita_semanal = df_semanal["ticket_medio"].sum()
-        n_clientes_semanal = len(df_semanal)
-
-        col1, col2 = st.columns(2)
-        col1.metric("Receita Potencial (semana)", f"R$ {receita_semanal:,.0f}".replace(",", "."))
-        col2.metric("Clientes na Janela", f"{n_clientes_semanal}")
-
-        if n_clientes_semanal > 0:
-            st.dataframe(
-                df_semanal[["Nome", "PlayG", "GAP", "Faixa_GAP", "ticket_medio"]]
-                .sort_values("GAP")
-                .rename(columns={"ticket_medio": "Ticket Médio (R$)"})
-                .reset_index(),
-                use_container_width=True,
-                hide_index=True,
-            )
-        else:
-            st.info("Nenhum cliente na janela de -5 a +5 dias com os limiares atuais.")
-
         st.divider()
         st.subheader("Projeção Estratégica")
         st.caption(
@@ -243,8 +274,11 @@ if "rmr_result" in st.session_state:
             "Ticket Médio × compras esperadas (período ÷ Ritmo)."
         )
 
+        elegíveis_proj = result_df[result_df["Segmento_RMR"] != "Inelegível"].copy()
+        elegíveis_proj["ticket_medio"] = elegíveis_proj["Monetario"]
+
         # Apenas clientes com Ritmo definido (elegíveis já exclui Inelegível, mas Ritmo pode ser NaN em edge cases)
-        df_proj = elegíveis[elegíveis["Ritmo"].notna() & (elegíveis["Ritmo"] > 0)].copy()
+        df_proj = elegíveis_proj[elegíveis_proj["Ritmo"].notna() & (elegíveis_proj["Ritmo"] > 0)].copy()
 
         def calcular_projecao(df: pd.DataFrame, periodo_dias: int) -> float:
             """Soma receita projetada: ticket_medio × floor(periodo_dias / ritmo) por cliente."""
@@ -265,7 +299,66 @@ if "rmr_result" in st.session_state:
             f"(excluídos clientes com 1 compra)."
         )
 
-    with tab_config:
+# ─── Tab Importação ───────────────────────────────────────────────────────────
+
+with tab_importacao:
+    st.header("Carregar Dados")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        base_bu_file = st.file_uploader(
+            "Base B.U.",
+            type=["xlsx"],
+            key="base_bu",
+            help="Arquivo Excel com colunas: ID, Nome, PlayG, Telefone",
+        )
+    with col2:
+        historico_file = st.file_uploader(
+            "Histórico de Crédito",
+            type=["xlsx"],
+            key="historico",
+            help="Arquivo Excel com colunas: ID, Tipo, Valor, Data",
+        )
+
+    if st.button("Calcular RMR", type="primary", disabled=(base_bu_file is None or historico_file is None)):
+        try:
+            with st.spinner("Processando dados..."):
+                # 1. Carregar arquivos
+                base_df = load_base_bu(base_bu_file)
+                hist_df = load_historico(historico_file)
+
+                # 2. Filtrar transações válidas (exclui PG1, tipos inválidos, etc.)
+                valid_df = get_valid_transactions(base_df, hist_df)
+
+                # 3. Calcular RMR + scores (pré-segmentação — imutável após cálculo)
+                rmr_df = compute_rmr(valid_df)
+                st.session_state["rmr_df"] = rmr_df
+
+                # 4. Aplicar segmentação com limiares correntes
+                st.session_state["rmr_result"] = apply_segmentation(
+                    rmr_df, st.session_state.get("gap_thresholds", DEFAULT_GAP_THRESHOLDS)
+                )
+
+        except Exception as e:
+            import traceback
+            st.error(f"Erro ao processar os dados: {e}")
+            st.code(traceback.format_exc())
+            st.session_state.pop("rmr_result", None)
+            st.session_state.pop("rmr_df", None)
+
+    if "rmr_result" in st.session_state:
+        result_df = st.session_state["rmr_result"]
+        total_clientes = len(result_df)
+        inelegiveis = (result_df["Segmento_RMR"] == "Inelegível").sum()
+        st.success(f"{total_clientes} clientes no RMR ({inelegiveis} inelegíveis por 1 compra)")
+        st.info("Dados carregados. Navegue pelas abas Lista, Receita e Painel.")
+
+# ─── Tab Configuração ─────────────────────────────────────────────────────────
+
+with tab_config:
+    if "rmr_result" not in st.session_state:
+        st.info("Importe os dados na aba **Importação** para configurar os limiares.")
+    else:
         st.subheader("Limiares de GAP")
         st.caption("Alterar os limiares recalcula automaticamente todas as visualizações.")
 
