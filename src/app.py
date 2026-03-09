@@ -116,14 +116,43 @@ if "rmr_result" in st.session_state:
             "Campeões", "Não Pode Perder", "Leais", "Novos Clientes",
             "Potenciais Leais", "Em Risco", "Hibernando", "Precisam Atenção"
         ]
-        seg_counts = (
-            elegíveis["Segmento_RMR"]
-            .value_counts()
+        seg_data = (
+            elegíveis[elegíveis["Segmento_RMR"].isin(ORDEM_SEGMENTOS)]
+            .groupby("Segmento_RMR", observed=True)
+            .agg(Clientes=("Segmento_RMR", "count"), Receita=("Monetario", "sum"))
             .reindex(ORDEM_SEGMENTOS, fill_value=0)
             .reset_index()
         )
-        seg_counts.columns = ["Segmento", "Clientes"]
-        st.dataframe(seg_counts, use_container_width=True, hide_index=True)
+        seg_data.columns = ["Segmento", "Clientes", "Receita"]
+        # Inverter ordem para que o gráfico horizontal mostre Campeões no topo
+        seg_data = seg_data.iloc[::-1].reset_index(drop=True)
+
+        fig_seg = px.bar(
+            seg_data,
+            x="Clientes",
+            y="Segmento",
+            orientation="h",
+            text="Clientes",
+            hover_data={"Receita": ":,.0f"},
+            labels={"Clientes": "Quantidade de Clientes", "Segmento": "Segmento RMR"},
+            color_discrete_sequence=["#1f77b4"],
+        )
+        fig_seg.update_traces(textposition="outside")
+        fig_seg.update_layout(
+            showlegend=False,
+            plot_bgcolor="rgba(0,0,0,0)",
+            yaxis={"categoryorder": "array", "categoryarray": seg_data["Segmento"].tolist()},
+            margin={"l": 160},
+        )
+        st.plotly_chart(fig_seg, use_container_width=True)
+        st.caption(
+            f"Receita total por segmento (ticket médio): "
+            + " | ".join(
+                f"{row['Segmento']}: R$ {row['Receita']:,.0f}".replace(",", ".")
+                for _, row in seg_data.iloc[::-1].iterrows()
+                if row["Clientes"] > 0
+            )
+        )
 
         st.divider()
         st.subheader("Distribuição de GAP por Faixa")
