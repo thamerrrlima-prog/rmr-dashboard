@@ -44,11 +44,11 @@
 
 ### Lista de Prioridade
 
-- [ ] **LST-01**: Tabela de clientes ordenada por GAP ascendente (mais negativos primeiro = mais urgentes)
-- [ ] **LST-02**: Colunas: ID, Nome, Telefone, GAP (em dias), Classificação GAP, Ticket Médio
-- [ ] **LST-03**: Filtro por PlayG (Todos / PG2 / PG3 / PG8)
-- [ ] **LST-04**: Filtro por Classificação GAP (Crítico / Atrasado / Hora de Comprar / Em Breve / Folgado)
-- [ ] **LST-05**: Busca por texto livre (nome ou ID do cliente)
+- [x] **LST-01**: Tabela de clientes ordenada por GAP ascendente (mais negativos primeiro = mais urgentes)
+- [x] **LST-02**: Colunas: ID, Nome, Telefone, GAP (em dias), Classificação GAP, Ticket Médio
+- [x] **LST-03**: Filtro por PlayG (Todos / PG2 / PG3 / PG8)
+- [x] **LST-04**: Filtro por Classificação GAP (Crítico / Atrasado / Hora de Comprar / Em Breve / Folgado)
+- [x] **LST-05**: Busca por texto livre (nome ou ID do cliente)
 
 ### Interface e Deploy
 

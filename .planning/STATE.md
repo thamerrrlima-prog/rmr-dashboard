@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 03-lista-de-prioridade-e-deploy-02-PLAN.md
-last_updated: "2026-03-09T21:19:49.751Z"
+stopped_at: Completed 03-lista-de-prioridade-e-deploy-03-01-PLAN.md
+last_updated: "2026-03-09T21:20:51.996Z"
 last_activity: "2026-03-09 — Plan 01-03 completed: segmentation (8 segments, 5 GAP ranges) + Streamlit app (84 tests passing)"
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 10
-  completed_plans: 8
+  completed_plans: 9
   percent: 33
 ---
 
@@ -55,6 +55,7 @@ Progress: [████░░░░░░] 33%
 | Phase 02-painel-analitico P03 | 2min | 2 tasks | 1 files |
 | Phase 02-painel-analitico P04 | 2min | 2 tasks | 1 files |
 | Phase 03-lista-de-prioridade-e-deploy P02 | 1min | 2 tasks | 2 files |
+| Phase 03-lista-de-prioridade-e-deploy P01 | 2min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,9 @@ Recent decisions affecting current work:
 - [Phase 02-painel-analitico]: GAP histogram uses .melt() long format for px.bar barmode='group' dual-series chart (Clientes blue, Receita green)
 - [Phase 03-lista-de-prioridade-e-deploy]: python-calamine kept in requirements.txt — _read_excel_robust() uses engine='calamine' as fallback in data_loader.py
 - [Phase 03-lista-de-prioridade-e-deploy]: pytest removed from requirements.txt — dev dependency not needed on Streamlit Cloud
+- [Phase 03-lista-de-prioridade-e-deploy]: 5 tabs always visible without conditional: Lista | Receita | Painel | Importação | Configuração
+- [Phase 03-lista-de-prioridade-e-deploy]: Upload block moved into tab_importacao — cleaner entry point for first-time users
+- [Phase 03-lista-de-prioridade-e-deploy]: Projeção Estratégica relocated from tab_receita to tab_painel — strategic view belongs with KPIs
 
 ### Pending Todos
 
@@ -98,6 +102,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T21:19:49.749Z
-Stopped at: Completed 03-lista-de-prioridade-e-deploy-02-PLAN.md
+Last session: 2026-03-09T21:20:51.994Z
+Stopped at: Completed 03-lista-de-prioridade-e-deploy-03-01-PLAN.md
 Resume file: None
