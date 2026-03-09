@@ -52,9 +52,9 @@
 
 ### Interface e Deploy
 
-- [ ] **UI-01**: Design dark theme, inspirado no HTML de referência existente
-- [ ] **UI-02**: Layout responsivo para uso em notebook dos vendedores
-- [ ] **DEP-01**: Aplicação hospedada no Streamlit Cloud, acessível via link único para os 5 vendedores
+- [x] **UI-01**: Design dark theme, inspirado no HTML de referência existente
+- [x] **UI-02**: Layout responsivo para uso em notebook dos vendedores
+- [x] **DEP-01**: Aplicação hospedada no Streamlit Cloud, acessível via link único para os 5 vendedores
 
 ## v2 Requirements
 
@@ -86,7 +86,7 @@
 | REV-01, REV-02 | Phase 2 | Pending |
 | LST-01 a LST-05 | Phase 3 | Pending |
 | UI-01, UI-02 | Phase 3 | Pending |
-| DEP-01 | Phase 3 | Pending |
+| DEP-01 | Phase 3 | Complete |
 
 **Coverage:**
 - v1 requirements: 27 total

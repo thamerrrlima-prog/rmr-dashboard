@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Phase 3 context gathered
-last_updated: "2026-03-09T20:56:40.785Z"
+stopped_at: Completed 03-lista-de-prioridade-e-deploy-02-PLAN.md
+last_updated: "2026-03-09T21:19:49.751Z"
 last_activity: "2026-03-09 — Plan 01-03 completed: segmentation (8 segments, 5 GAP ranges) + Streamlit app (84 tests passing)"
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 10
+  completed_plans: 8
   percent: 33
 ---
 
@@ -54,6 +54,7 @@ Progress: [████░░░░░░] 33%
 | Phase 02-painel-analitico P02 | 2min | 2 tasks | 2 files |
 | Phase 02-painel-analitico P03 | 2min | 2 tasks | 1 files |
 | Phase 02-painel-analitico P04 | 2min | 2 tasks | 1 files |
+| Phase 03-lista-de-prioridade-e-deploy P02 | 1min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,8 @@ Recent decisions affecting current work:
 - [Phase 02-painel-analitico]: calcular_projecao() filtra Ritmo > 0 além de notna() — evita divisão por zero em edge cases
 - [Phase 02-painel-analitico]: VIZ-03 (heatmap R x Ritmo) intentionally excluded per explicit user decision
 - [Phase 02-painel-analitico]: GAP histogram uses .melt() long format for px.bar barmode='group' dual-series chart (Clientes blue, Receita green)
+- [Phase 03-lista-de-prioridade-e-deploy]: python-calamine kept in requirements.txt — _read_excel_robust() uses engine='calamine' as fallback in data_loader.py
+- [Phase 03-lista-de-prioridade-e-deploy]: pytest removed from requirements.txt — dev dependency not needed on Streamlit Cloud
 
 ### Pending Todos
 
@@ -95,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T20:56:40.777Z
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-lista-de-prioridade-e-deploy/03-CONTEXT.md
+Last session: 2026-03-09T21:19:49.749Z
+Stopped at: Completed 03-lista-de-prioridade-e-deploy-02-PLAN.md
+Resume file: None
