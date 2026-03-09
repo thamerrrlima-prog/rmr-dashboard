@@ -166,26 +166,43 @@ if "rmr_result" in st.session_state:
             "Folgado": "#9467bd",
         }
 
-        gap_counts = (
-            elegíveis[elegíveis["Faixa_GAP"].isin(ORDEM_FAIXAS)]["Faixa_GAP"]
-            .value_counts()
+        gap_data = (
+            elegíveis[elegíveis["Faixa_GAP"].isin(ORDEM_FAIXAS)]
+            .groupby("Faixa_GAP", observed=True)
+            .agg(Clientes=("Faixa_GAP", "count"), Receita=("Monetario", "sum"))
             .reindex(ORDEM_FAIXAS, fill_value=0)
             .reset_index()
         )
-        gap_counts.columns = ["Faixa", "Clientes"]
+        gap_data.columns = ["Faixa", "Clientes", "Receita"]
 
-        fig = px.bar(
-            gap_counts,
-            x="Faixa",
-            y="Clientes",
-            color="Faixa",
-            color_discrete_map=CORES_FAIXAS,
-            labels={"Faixa": "Faixa de GAP", "Clientes": "Quantidade de Clientes"},
-            text="Clientes",
+        # Formato longo para px.bar com barmode='group'
+        gap_long = gap_data.melt(
+            id_vars="Faixa",
+            value_vars=["Clientes", "Receita"],
+            var_name="Métrica",
+            value_name="Valor",
         )
-        fig.update_traces(textposition="outside")
-        fig.update_layout(showlegend=False, plot_bgcolor="rgba(0,0,0,0)")
-        st.plotly_chart(fig, use_container_width=True)
+
+        fig_gap = px.bar(
+            gap_long,
+            x="Faixa",
+            y="Valor",
+            color="Métrica",
+            barmode="group",
+            text="Valor",
+            category_orders={"Faixa": ORDEM_FAIXAS, "Métrica": ["Clientes", "Receita"]},
+            color_discrete_map={"Clientes": "#1f77b4", "Receita": "#2ca02c"},
+            labels={"Faixa": "Faixa de GAP", "Valor": "Quantidade / Receita (R$)"},
+        )
+        fig_gap.update_traces(
+            texttemplate="%{y:,.0f}",
+            textposition="outside",
+        )
+        fig_gap.update_layout(
+            plot_bgcolor="rgba(0,0,0,0)",
+            legend_title_text="",
+        )
+        st.plotly_chart(fig_gap, use_container_width=True)
 
     with tab_receita:
         result_df = st.session_state["rmr_result"]
