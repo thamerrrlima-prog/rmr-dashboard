@@ -159,7 +159,65 @@ if "rmr_result" in st.session_state:
         st.plotly_chart(fig, use_container_width=True)
 
     with tab_receita:
-        st.info("Receita projetada — em construção (Plano 03)")
+        result_df = st.session_state["rmr_result"]
+        elegíveis = result_df[result_df["Segmento_RMR"] != "Inelegível"].copy()
+
+        # Ticket médio = Monetario total do cliente no período (estimativa conservadora)
+        elegíveis["ticket_medio"] = elegíveis["Monetario"]
+
+        st.subheader("Receita Semanal")
+        st.caption("Clientes com GAP entre -5 e +5 dias — janela imediata de compra.")
+
+        semanal_mask = (elegíveis["GAP"] >= -5) & (elegíveis["GAP"] <= 5)
+        df_semanal = elegíveis[semanal_mask]
+
+        receita_semanal = df_semanal["ticket_medio"].sum()
+        n_clientes_semanal = len(df_semanal)
+
+        col1, col2 = st.columns(2)
+        col1.metric("Receita Potencial (semana)", f"R$ {receita_semanal:,.0f}".replace(",", "."))
+        col2.metric("Clientes na Janela", f"{n_clientes_semanal}")
+
+        if n_clientes_semanal > 0:
+            st.dataframe(
+                df_semanal[["Nome", "PlayG", "GAP", "Faixa_GAP", "ticket_medio"]]
+                .sort_values("GAP")
+                .rename(columns={"ticket_medio": "Ticket Médio (R$)"})
+                .reset_index(),
+                use_container_width=True,
+                hide_index=True,
+            )
+        else:
+            st.info("Nenhum cliente na janela de -5 a +5 dias com os limiares atuais.")
+
+        st.divider()
+        st.subheader("Projeção Estratégica")
+        st.caption(
+            "Receita esperada por período — calculada por cliente como "
+            "Ticket Médio × compras esperadas (período ÷ Ritmo)."
+        )
+
+        # Apenas clientes com Ritmo definido (elegíveis já exclui Inelegível, mas Ritmo pode ser NaN em edge cases)
+        df_proj = elegíveis[elegíveis["Ritmo"].notna() & (elegíveis["Ritmo"] > 0)].copy()
+
+        def calcular_projecao(df: pd.DataFrame, periodo_dias: int) -> float:
+            """Soma receita projetada: ticket_medio × floor(periodo_dias / ritmo) por cliente."""
+            compras_esperadas = (periodo_dias / df["Ritmo"]).apply(lambda x: max(int(x), 0))
+            return (df["ticket_medio"] * compras_esperadas).sum()
+
+        proj_30 = calcular_projecao(df_proj, 30)
+        proj_60 = calcular_projecao(df_proj, 60)
+        proj_90 = calcular_projecao(df_proj, 90)
+
+        c1, c2, c3 = st.columns(3)
+        c1.metric("30 dias", f"R$ {proj_30:,.0f}".replace(",", "."))
+        c2.metric("60 dias", f"R$ {proj_60:,.0f}".replace(",", "."))
+        c3.metric("90 dias", f"R$ {proj_90:,.0f}".replace(",", "."))
+
+        st.caption(
+            f"Base de cálculo: {len(df_proj)} clientes com Ritmo definido "
+            f"(excluídos clientes com 1 compra)."
+        )
 
     with tab_config:
         st.subheader("Limiares de GAP")
