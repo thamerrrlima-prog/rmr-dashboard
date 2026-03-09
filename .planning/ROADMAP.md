@@ -21,7 +21,12 @@ Tres fases que entregam um dashboard Streamlit completo: a Fase 1 constrói o mo
   2. Cada cliente elegivel tem Recencia, Monetario, Ritmo, GAP e scores (1-5) calculados corretamente por PlayG
   3. Clientes com apenas 1 compra aparecem excluidos do RMR (Ritmo = NULL)
   4. Cada cliente esta classificado em um dos 8 segmentos RMR e em uma das 5 faixas de GAP
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Ingestão e filtragem dos dois arquivos .xlsx (data_loader.py)
+- [ ] 01-02-PLAN.md — Motor RMR: cálculo de R, M, Ritmo, GAP e scores por quintis por PlayG
+- [ ] 01-03-PLAN.md — Segmentação em 8 segmentos RMR + 5 faixas de GAP + entrypoint Streamlit
 
 ### Phase 2: Painel Analitico
 **Goal**: O vendedor ve KPIs, graficos e projecoes de receita — tudo recalculando em tempo real ao ajustar os limiares de GAP
@@ -53,6 +58,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Motor RMR | 0/TBD | Not started | - |
+| 1. Motor RMR | 0/3 | Not started | - |
 | 2. Painel Analitico | 0/TBD | Not started | - |
 | 3. Lista de Prioridade e Deploy | 0/TBD | Not started | - |
