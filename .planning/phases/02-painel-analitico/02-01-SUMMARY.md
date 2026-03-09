@@ -67,7 +67,7 @@ completed: 2026-03-09
 
 1. **Task 1: Separar session_state e estruturar tabs em app.py** - `d43a08d` (feat)
 
-**Plan metadata:** _(a ser adicionado após commit final)_
+**Plan metadata:** `7e2563b` (docs: complete plan)
 
 ## Files Created/Modified
 - `src/app.py` - Refatorado com session_state split, tabs, Tab Configuração com sliders e recálculo em tempo real
