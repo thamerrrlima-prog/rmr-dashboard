@@ -234,3 +234,64 @@ class TestValidateColumns:
             validate_columns(df, {"ID": ["id"]}, "historico.xlsx")
         msg = str(exc_info.value)
         assert "historico.xlsx" in msg
+
+
+# ─── Testes Task 2: colunas renomeadas e validação em load_base_bu / load_historico ─
+
+class TestColunaRenomeada:
+    def test_load_base_bu_aceita_id_cliente(self):
+        """Base B.U. com coluna 'id_cliente' deve ser normalizada para 'ID'."""
+        df = pd.DataFrame({
+            "id_cliente": [1, 2],
+            "nome do cliente": ["Alice", "Bob"],
+            "playg": ["PG2", "PG3"],
+            "telefone": ["11999990001", "11999990002"],
+        })
+        buf = BytesIO()
+        df.to_excel(buf, index=False)
+        buf.seek(0)
+        result = load_base_bu(buf)
+        assert "ID" in result.columns
+        assert "Nome" in result.columns
+        assert "PlayG" in result.columns
+        assert "Telefone" in result.columns
+        assert len(result) == 2
+
+    def test_load_historico_aceita_colunas_renomeadas(self):
+        """Historico com 'id_cliente', 'tipo transacao', 'montante', 'dt' deve normalizar."""
+        df = pd.DataFrame({
+            "id_cliente": [1],
+            "tipo transacao": ["Nova Compra"],
+            "montante": [500.0],
+            "dt": [pd.Timestamp("2024-06-01")],
+        })
+        buf = BytesIO()
+        df.to_excel(buf, index=False)
+        buf.seek(0)
+        result = load_historico(buf)
+        assert "ID" in result.columns
+        assert "Tipo" in result.columns
+        assert "Valor" in result.columns
+        assert "Data" in result.columns
+
+    def test_load_base_bu_valueerror_coluna_ausente(self):
+        """load_base_bu deve levantar ValueError com mensagem legível se coluna ausente."""
+        df = pd.DataFrame({"ID": [1], "Nome": ["Alice"]})  # faltam PlayG, Telefone
+        buf = BytesIO()
+        df.to_excel(buf, index=False)
+        buf.seek(0)
+        with pytest.raises(ValueError) as exc_info:
+            load_base_bu(buf)
+        msg = str(exc_info.value)
+        assert "base_bu.xlsx" in msg
+
+    def test_load_historico_valueerror_coluna_ausente(self):
+        """load_historico deve levantar ValueError com mensagem legível se coluna ausente."""
+        df = pd.DataFrame({"ID": [1], "Tipo": ["Nova Compra"]})  # faltam Valor, Data
+        buf = BytesIO()
+        df.to_excel(buf, index=False)
+        buf.seek(0)
+        with pytest.raises(ValueError) as exc_info:
+            load_historico(buf)
+        msg = str(exc_info.value)
+        assert "historico_credito.xlsx" in msg
