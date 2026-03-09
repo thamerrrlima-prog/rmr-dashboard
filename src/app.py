@@ -1,7 +1,7 @@
 """
-app.py — Entrypoint Streamlit do Dashboard RMR LigueLead (Fase 1).
+app.py — Entrypoint Streamlit do Dashboard RMR LigueLead.
 
-Pipeline: upload → data_loader → rmr_engine → segmentation → tabela de resultado.
+Pipeline: upload → data_loader → rmr_engine → segmentation → painel analítico.
 """
 
 import streamlit as st
@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from src.data_loader import load_base_bu, load_historico, get_valid_transactions
 from src.rmr_engine import compute_rmr
-from src.segmentation import apply_segmentation
+from src.segmentation import apply_segmentation, DEFAULT_GAP_THRESHOLDS
 
 # ─── Configuração da página ───────────────────────────────────────────────────
 
@@ -22,6 +22,11 @@ st.set_page_config(
 )
 
 st.title("RMR Dashboard — LigueLead")
+
+# ─── Inicialização do session_state ───────────────────────────────────────────
+
+if "gap_thresholds" not in st.session_state:
+    st.session_state["gap_thresholds"] = DEFAULT_GAP_THRESHOLDS.copy()
 
 # ─── Upload ───────────────────────────────────────────────────────────────────
 
@@ -57,18 +62,21 @@ if st.button("Calcular RMR", type="primary", disabled=(base_bu_file is None or h
             # 2. Filtrar transações válidas (exclui PG1, tipos inválidos, etc.)
             valid_df = get_valid_transactions(base_df, hist_df)
 
-            # 3. Calcular RMR + scores
+            # 3. Calcular RMR + scores (pré-segmentação — imutável após cálculo)
             rmr_df = compute_rmr(valid_df)
+            st.session_state["rmr_df"] = rmr_df
 
-            # 4. Aplicar segmentação
-            result_df = apply_segmentation(rmr_df)
-
-        # Armazenar no session_state para evitar recálculo ao interagir
-        st.session_state["rmr_result"] = result_df
+            # 4. Aplicar segmentação com limiares correntes
+            st.session_state["rmr_result"] = apply_segmentation(
+                rmr_df, st.session_state.get("gap_thresholds", DEFAULT_GAP_THRESHOLDS)
+            )
 
     except Exception as e:
+        import traceback
         st.error(f"Erro ao processar os dados: {e}")
+        st.code(traceback.format_exc())
         st.session_state.pop("rmr_result", None)
+        st.session_state.pop("rmr_df", None)
 
 # ─── Exibição dos resultados ──────────────────────────────────────────────────
 
@@ -82,22 +90,55 @@ if "rmr_result" in st.session_state:
         f"{total_clientes} clientes no RMR ({inelegiveis} inelegíveis por 1 compra)"
     )
 
-    # Selecionar e ordenar colunas para exibição
-    display_cols = [
-        "Nome", "PlayG", "Telefone",
-        "Recencia", "Monetario", "Ritmo", "GAP",
-        "score_R", "score_M", "score_Ritmo",
-        "Segmento_RMR", "Faixa_GAP",
-    ]
+    tab_painel, tab_receita, tab_config = st.tabs(["Painel", "Receita", "Configuração"])
 
-    # Garantir que apenas colunas existentes sejam exibidas
-    existing_cols = [c for c in display_cols if c in result_df.columns]
+    with tab_painel:
+        st.info("Painel analítico — em construção (Plano 02)")
 
-    # Incluir ID (índice) na visualização
-    display_df = result_df[existing_cols].reset_index()
+    with tab_receita:
+        st.info("Receita projetada — em construção (Plano 03)")
 
-    st.dataframe(
-        display_df,
-        use_container_width=True,
-        hide_index=True,
-    )
+    with tab_config:
+        st.subheader("Limiares de GAP")
+        st.caption("Alterar os limiares recalcula automaticamente todas as visualizações.")
+
+        thresholds = st.session_state["gap_thresholds"]
+
+        critico_max = st.slider(
+            "Crítico: GAP abaixo de (dias)",
+            min_value=-120, max_value=-5, step=1,
+            value=thresholds["critico_max"],
+            help="Clientes com GAP < este valor são classificados como Crítico"
+        )
+        atrasado_max = st.slider(
+            "Atrasado: GAP abaixo de (dias)",
+            min_value=-60, max_value=0, step=1,
+            value=thresholds["atrasado_max"],
+            help="GAP entre crítico_max e este valor = Atrasado"
+        )
+        hora_max = st.slider(
+            "Hora de Comprar: GAP até (dias)",
+            min_value=-30, max_value=15, step=1,
+            value=thresholds["hora_max"],
+            help="GAP entre atrasado_max e este valor = Hora de Comprar"
+        )
+        em_breve_max = st.slider(
+            "Em Breve: GAP até (dias)",
+            min_value=1, max_value=30, step=1,
+            value=thresholds["em_breve_max"],
+            help="GAP entre hora_max e este valor = Em Breve. Acima = Folgado"
+        )
+
+        new_thresholds = {
+            "critico_max": critico_max,
+            "atrasado_max": atrasado_max,
+            "hora_max": hora_max,
+            "em_breve_max": em_breve_max,
+        }
+
+        if new_thresholds != st.session_state["gap_thresholds"]:
+            st.session_state["gap_thresholds"] = new_thresholds
+            st.session_state["rmr_result"] = apply_segmentation(
+                st.session_state["rmr_df"], new_thresholds
+            )
+            st.rerun()
