@@ -23,6 +23,26 @@ st.set_page_config(
     layout="wide",
 )
 
+# ─── Autenticação ─────────────────────────────────────────────────────────────
+
+def _check_password() -> bool:
+    if st.session_state.get("authenticated"):
+        return True
+    st.title("RMR Dashboard — LigueLead")
+    st.text_input("Senha", type="password", key="_senha_input")
+    if st.button("Entrar"):
+        if st.session_state["_senha_input"] == st.secrets.get("password", ""):
+            st.session_state["authenticated"] = True
+            st.rerun()
+        else:
+            st.error("Senha incorreta.")
+    return False
+
+if not _check_password():
+    st.stop()
+
+# ─── App principal ────────────────────────────────────────────────────────────
+
 st.title("RMR Dashboard — LigueLead")
 
 # ─── Inicialização do session_state ───────────────────────────────────────────
