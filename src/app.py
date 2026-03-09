@@ -161,18 +161,6 @@ with tab_painel:
         result_df = st.session_state["rmr_result"]
         elegíveis = result_df[result_df["Segmento_RMR"] != "Inelegível"]
 
-        total_rmr = len(elegíveis)
-        pct_gap_negativo = (elegíveis["GAP"] < 0).sum() / len(elegíveis) * 100 if len(elegíveis) > 0 else 0
-        receita_risco = elegíveis[elegíveis["GAP"] < 0]["Monetario"].sum()
-        ritmo_medio = elegíveis["Ritmo"].dropna().mean()
-
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Clientes no RMR", f"{total_rmr:,}")
-        c2.metric("GAP Negativo", f"{pct_gap_negativo:.1f}%")
-        c3.metric("Receita em Risco", f"R$ {receita_risco:,.0f}".replace(",", "."))
-        c4.metric("Ritmo Médio", f"{ritmo_medio:.0f} dias" if not pd.isna(ritmo_medio) else "—")
-
-        st.divider()
         st.subheader("Projeção Estratégica")
         st.caption(
             "Receita esperada por período — calculada por cliente como "
@@ -203,6 +191,18 @@ with tab_painel:
             f"Base de cálculo: {len(df_proj)} clientes com Ritmo definido "
             f"(excluídos clientes com 1 compra)."
         )
+
+        st.divider()
+        total_rmr = len(elegíveis)
+        pct_gap_negativo = (elegíveis["GAP"] < 0).sum() / len(elegíveis) * 100 if len(elegíveis) > 0 else 0
+        receita_risco = elegíveis[elegíveis["GAP"] < 0]["Monetario"].sum()
+        ritmo_medio = elegíveis["Ritmo"].dropna().mean()
+
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Clientes no RMR", f"{total_rmr:,}")
+        c2.metric("GAP Negativo", f"{pct_gap_negativo:.1f}%")
+        c3.metric("Receita em Risco", f"R$ {receita_risco:,.0f}".replace(",", "."))
+        c4.metric("Ritmo Médio", f"{ritmo_medio:.0f} dias" if not pd.isna(ritmo_medio) else "—")
 
         st.divider()
         st.subheader("Distribuição por Segmento RMR")
