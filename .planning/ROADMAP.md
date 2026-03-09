@@ -54,7 +54,12 @@ Plans:
   3. Busca por nome ou ID retorna o cliente correto independente de maiusculas ou minusculas
   4. Interface usa dark theme consistente com a referencia visual e funciona sem scroll horizontal em notebooks
   5. Os 5 vendedores acessam o dashboard pelo mesmo link no Streamlit Cloud sem necessidade de login
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Tab Lista: tabela de prioridade com filtros PlayG, Classificação GAP e busca por texto
+- [ ] 03-02-PLAN.md — Dark theme (.streamlit/config.toml) + requirements.txt para deploy no Streamlit Cloud
+- [ ] 03-03-PLAN.md — Verificação visual (dark theme, layout responsivo) — checkpoint humano
 
 ## Progress
 
@@ -65,4 +70,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Motor RMR | 3/3 | Complete | 2026-03-09 |
 | 2. Painel Analitico | 1/3 | In Progress|  |
-| 3. Lista de Prioridade e Deploy | 0/TBD | Not started | - |
+| 3. Lista de Prioridade e Deploy | 0/3 | Not started | - |
