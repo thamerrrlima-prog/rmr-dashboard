@@ -22,9 +22,9 @@ COLUNAS_BASE_BU: dict[str, list[str]] = {
 }
 
 COLUNAS_HISTORICO: dict[str, list[str]] = {
-    "ID":    ["id", "id_cliente", "id cliente", "codigo", "código", "id do cliente"],
+    "ID":    ["id cliente", "id_cliente", "id", "codigo", "código", "id do cliente", "cliente"],
     "Tipo":  ["tipo", "tipo transacao", "tipo_transacao", "tipo de transação", "tipo transação"],
-    "Valor": ["valor", "valor transacao", "valor_transacao", "valor (r$)", "montante"],
+    "Valor": ["valor", "valor transacao", "valor_transacao", "valor (r$)", "montante", "crédito", "credito"],
     "Data":  ["data", "data transacao", "data_transacao", "data de transação",
               "data transação", "data lançamento", "data lancamento", "dt"],
 }
@@ -106,6 +106,22 @@ def validate_columns(
 
 # ─── Funções públicas ──────────────────────────────────────────────────────────
 
+def _read_excel_robust(file) -> pd.DataFrame:
+    """Tenta ler xlsx com openpyxl; faz fallback para calamine em caso de erro de estilo."""
+    import io
+    # Lê bytes upfront para poder fazer retry sem consumir o stream
+    if hasattr(file, "read"):
+        data = file.read()
+        buf = io.BytesIO(data)
+    else:
+        buf = file
+    try:
+        return pd.read_excel(buf, engine="openpyxl")
+    except Exception:
+        buf.seek(0)
+        return pd.read_excel(buf, engine="calamine")
+
+
 def load_base_bu(file) -> pd.DataFrame:
     """
     Carrega o arquivo Base B.U. (.xlsx).
@@ -123,15 +139,15 @@ def load_base_bu(file) -> pd.DataFrame:
     -------
     ValueError se colunas obrigatórias ausentes.
     """
-    df = pd.read_excel(file)
+    df = _read_excel_robust(file)
     df = validate_columns(df, COLUNAS_BASE_BU, filename_hint="base_bu.xlsx")
 
     # Selecionar apenas colunas canônicas (descartar extras)
     df = df[list(COLUNAS_BASE_BU.keys())].copy()
 
-    # Excluir PG1 (aceita string "PG1" ou inteiro 1)
-    pg_col = df["PlayG"].astype(str).str.strip()
-    df = df[~pg_col.isin(["PG1", "1"])].reset_index(drop=True)
+    # Excluir PG1 — aceita qualquer variação: "PG1", "PlayG 1", "PlayG1", "1"
+    pg_col = df["PlayG"].astype(str).str.strip().str.lower().str.replace(r"\s+", "", regex=True)
+    df = df[~pg_col.isin(["pg1", "playg1", "1"])].reset_index(drop=True)
 
     return df
 
@@ -154,14 +170,24 @@ def load_historico(file) -> pd.DataFrame:
     -------
     ValueError se colunas obrigatórias ausentes.
     """
-    df = pd.read_excel(file)
+    df = _read_excel_robust(file)
+
+    # Se existirem "ID" (transação) e "ID Cliente" simultaneamente, usar "ID Cliente"
+    cols_lower = {c.strip().lower(): c for c in df.columns}
+    if "id cliente" in cols_lower and "id" in cols_lower:
+        df = df.rename(columns={cols_lower["id"]: "__id_transacao__"})
+
     df = validate_columns(df, COLUNAS_HISTORICO, filename_hint="historico_credito.xlsx")
 
     # Converter coluna de data para datetime
     df["Data"] = pd.to_datetime(df["Data"], errors="coerce")
 
-    # Converter coluna Valor para numérico (coerce strings não-numéricas para NaN)
-    df["Valor"] = pd.to_numeric(df["Valor"], errors="coerce")
+    # Converter coluna Valor para numérico — suporta "R$ 1.500,00" e "1500.00"
+    valor = df["Valor"].astype(str).str.strip()
+    valor = valor.str.replace(r"R\$?\s*", "", regex=True)   # remove prefixo R$ ou R
+    if valor.str.contains(",").any():
+        valor = valor.str.replace(r"\.", "", regex=True).str.replace(",", ".", regex=False)
+    df["Valor"] = pd.to_numeric(valor, errors="coerce")
 
     return df
 

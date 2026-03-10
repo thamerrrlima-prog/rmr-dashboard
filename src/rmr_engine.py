@@ -66,9 +66,8 @@ def compute_rmr(
     recencia = (
         df.groupby("ID")["Data"]
         .max()
-        .apply(lambda d: (reference_date - d).days)
+        .apply(lambda d: int((reference_date - d) / pd.Timedelta(days=1)))
         .rename("Recencia")
-        .astype(int)
     )
 
     # ── 3. Monetário: soma de Valor por cliente ──────────────────────────────
@@ -77,11 +76,11 @@ def compute_rmr(
     # ── 4. Ritmo: média dos diffs entre datas únicas consecutivas ────────────
     def _calc_ritmo(group: pd.Series) -> float:
         """Calcula ritmo para um grupo de datas (série por ID)."""
-        datas_unicas = group.drop_duplicates().sort_values()
+        datas_unicas = group.drop_duplicates().sort_values().reset_index(drop=True)
         if len(datas_unicas) < 2:
             return float("nan")
-        diffs = datas_unicas.diff().dropna().dt.days
-        return float(diffs.mean())
+        total_days = (datas_unicas.iloc[-1] - datas_unicas.iloc[0]) / pd.Timedelta(days=1)
+        return float(total_days / (len(datas_unicas) - 1))
 
     ritmo = (
         df.groupby("ID")["Data"]
