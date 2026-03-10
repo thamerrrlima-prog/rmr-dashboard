@@ -17,11 +17,11 @@ import pandas as pd
 # ─── Constantes ───────────────────────────────────────────────────────────────
 
 DEFAULT_GAP_THRESHOLDS = {
-    "critico_max": -30,    # GAP < -30 → Crítico
-    "atrasado_max": -8,    # -30 <= GAP < -8 → Atrasado
-    "hora_max": 0,         # -8 <= GAP <= 0 → Hora de Comprar
-    "em_breve_max": 7,     # 0 < GAP <= 7 → Em Breve
-    # GAP > 7 → Folgado
+    "critico_max": -60,    # GAP < -60 → Crítico
+    "atrasado_max": -35,   # -60 <= GAP < -35 → Atrasado
+    "hora_max": -3,        # -35 <= GAP <= -3 → Hora de Comprar
+    "em_breve_max": 10,    # -3 < GAP <= 10 → Em Breve
+    # GAP > 10 → Folgado
 }
 
 
