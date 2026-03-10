@@ -10,11 +10,13 @@ import plotly.express as px
 import sys
 import os
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+_src_dir = os.path.dirname(os.path.abspath(__file__))
+if _src_dir not in sys.path:
+    sys.path.insert(0, _src_dir)
 
-from src.data_loader import load_base_bu, load_historico, get_valid_transactions
-from src.rmr_engine import compute_rmr
-from src.segmentation import apply_segmentation, DEFAULT_GAP_THRESHOLDS
+from data_loader import load_base_bu, load_historico, get_valid_transactions
+from rmr_engine import compute_rmr
+from segmentation import apply_segmentation, DEFAULT_GAP_THRESHOLDS
 
 # ─── Configuração da página ───────────────────────────────────────────────────
 
